@@ -284,13 +284,13 @@ static NSDictionary *getDictionaryFromNSError(NSError *error) {
 #pragma mark - AppDelegate
 // Handle links received through your app's custom URL scheme. Called when your
 // app receives a link and your app is opened for the first time after installation.
-- (BOOL)application:(UIApplication *)application
-            openURL:(NSURL *)url
-            options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
-  [self checkForDynamicLink:url];
-  // Results of this are ORed and NO doesn't affect other delegate interceptors' result.
-  return NO;
-}
+// - (BOOL)application:(UIApplication *)application
+//             openURL:(NSURL *)url
+//             options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
+//   [self checkForDynamicLink:url];
+//   // Results of this are ORed and NO doesn't affect other delegate interceptors' result.
+//   return NO;
+// }
 
 // Handle links received as Universal Links when the app is already installed (on iOS 9 and newer).
 - (BOOL)application:(UIApplication *)application
@@ -329,6 +329,23 @@ static NSDictionary *getDictionaryFromNSError(NSError *error) {
 
   return [[FIRDynamicLinks dynamicLinks] handleUniversalLink:userActivity.webpageURL
                                                   completion:completionBlock];
+}
+
+- (BOOL)application:(UIApplication *)app
+            openURL:(NSURL *)url
+            options:(NSDictionary<NSString *, id> *)options {
+  return [self application:app
+                   openURL:url
+         sourceApplication:options[UIApplicationOpenURLOptionsSourceApplicationKey]
+                annotation:options[UIApplicationOpenURLOptionsAnnotationKey]];
+}
+
+- (BOOL)application:(UIApplication *)application
+            openURL:(NSURL *)url
+  sourceApplication:(NSString *)sourceApplication
+         annotation:(id)annotation {
+  [self checkForDynamicLink:url];
+  return NO;
 }
 
 #pragma mark - Utilities
